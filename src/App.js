@@ -1,6 +1,8 @@
 import './App.css';
-import {useState} from 'react';
+import EditTaskForm from './EditTaskForm.js';
+import {useEffect, useState} from 'react';
 import dayjs from 'dayjs';
+import {useNavigate} from "react-router-dom";
 
 import TextField from '@mui/material/TextField';
 import Card from '@mui/material/Card';
@@ -23,11 +25,25 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
+
 function App() {
   const [todo, setTodo] = useState('');
   const [date, setDate] = useState(dayjs(new Date()));
   const [todos, setTodos] = useState([]);
   const [validation, setValidation] = useState();
+  const [editTask, setEditTask] = useState('');
+  const [updatedTask, setUpdatedTask] = useState('');
+  const [updatedDate, setUpdatedDate] = useState(dayjs(new Date()));
+
+  const navigate = useNavigate();
+
+  useEffect(() =>{
+    const isLoggedIn = window.localStorage.getItem("isLoggedIn");
+    if (!isLoggedIn) {
+      navigate("/login")
+    }
+  }, [])
+
   function handleSubmitClick(e){
     e.preventDefault();
     if (!todo) {
@@ -55,6 +71,9 @@ function App() {
     setTodos(todos.filter(todo => todo.id !== id))
   }
 
+  function handleEditClick(id){
+    editTask !== id ? setEditTask(id) : setEditTask('')
+  }
 
 
   return (<>
@@ -81,7 +100,7 @@ function App() {
 
     <Container>
       {todos.map(Todo =>
-        <Card sx={{ minWidth:40, m:2 }}>
+        <Card sx={{ minWidth:40, m:2 }} key={Todo.id}>
           <CardContent>
             <Typography sx={{fontSize:14}} color="text.secondary">
               Task
@@ -98,7 +117,18 @@ function App() {
           </CardContent>
           <CardActions>
             <Button size="small" variant='contained' onClick={() => handleRemoveClick(Todo.id)}>Remove task</Button>
+            <Button size="small" variant='contained' onClick={() => handleEditClick(Todo.id)}>Edit task</Button>
           </CardActions>
+          {editTask===Todo.id && <EditTaskForm 
+            id={Todo.id} 
+            updatedTask={updatedTask} 
+            updatedDate={updatedDate} 
+            setUpdatedTask={setUpdatedTask} 
+            setUpdatedDate={setUpdatedDate}
+            setTodos={setTodos}
+            todos = {todos}
+            setEditTask = {setEditTask}
+            />}
         </Card>
       )}
     </Container>
