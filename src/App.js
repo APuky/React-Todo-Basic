@@ -42,7 +42,7 @@ function App() {
     if (!isLoggedIn) {
       navigate("/login")
     }
-  }, [])
+  }, [navigate])
 
   function handleSubmitClick(e){
     e.preventDefault();
